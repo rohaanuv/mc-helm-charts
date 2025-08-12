@@ -1,0 +1,38 @@
+namespaces:
+  - name: dev-myapp
+    labels:
+      environment: dev
+      app: myapp
+    resourceQuota:
+      requests:
+        cpu: "500m"
+        memory: "256Mi"
+      limits:
+        cpu: "1"
+        memory: "512Mi"
+    limitRange:
+      default:
+        cpu: "500m"
+        memory: "256Mi"
+      defaultRequest:
+        cpu: "250m"
+        memory: "128Mi"
+
+  - name: staging-api
+    labels:
+      environment: staging
+      app: api
+    resourceQuota:
+      requests:
+        cpu: "200m"
+        memory: "128Mi"
+      limits:
+        cpu: "500m"
+        memory: "256Mi"
+    limitRange:
+      default:
+        cpu: "250m"
+        memory: "128Mi"
+      defaultRequest:
+        cpu: "100m"
+        memory: "64Mi"

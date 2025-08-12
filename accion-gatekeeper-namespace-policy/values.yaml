@@ -1,0 +1,21 @@
+namespace:
+  name: dev-myapp
+  labels:
+    environment: dev
+    app: myapp
+
+resourceQuota:
+  requests:
+    cpu: "500m"
+    memory: "256Mi"
+  limits:
+    cpu: "1"
+    memory: "512Mi"
+
+limitRange:
+  default:
+    cpu: "500m"
+    memory: "256Mi"
+  defaultRequest:
+    cpu: "250m"
+    memory: "128Mi"

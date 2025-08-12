@@ -1,0 +1,102 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8snamespacecompleterequirements
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sNamespaceCompleteRequirements
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8snamespacecompleterequirements
+
+        # --- Namespace Rules ---
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "Namespace"
+          not input.review.object.metadata.labels["app"]
+          msg := "Namespace must have a non-empty 'app' label"
+        }
+
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "Namespace"
+          not input.review.object.metadata.labels["environment"]
+          msg := "Namespace must have a non-empty 'environment' label"
+        }
+
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "Namespace"
+          name := input.review.object.metadata.name
+          not regex.match("^[a-z]+-[a-z0-9-]+$", name)
+          msg := "Namespace name must follow format <environment>-<appname>"
+        }
+
+        # --- ResourceQuota Rules ---
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "ResourceQuota"
+          quota := input.review.object.spec.hard
+          not quota["requests.cpu"]
+          msg := "ResourceQuota must define 'requests.cpu'"
+        }
+
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "ResourceQuota"
+          quota := input.review.object.spec.hard
+          not quota["requests.memory"]
+          msg := "ResourceQuota must define 'requests.memory'"
+        }
+
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "ResourceQuota"
+          quota := input.review.object.spec.hard
+          not quota["limits.cpu"]
+          msg := "ResourceQuota must define 'limits.cpu'"
+        }
+
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "ResourceQuota"
+          quota := input.review.object.spec.hard
+          not quota["limits.memory"]
+          msg := "ResourceQuota must define 'limits.memory'"
+        }
+
+        # --- LimitRange Rules ---
+        container := input.review.object.spec.limits[_]
+
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "LimitRange"
+          container.type == "Container"
+
+          default_val := container["default"]
+          not default_val["cpu"]
+          msg := "LimitRange must define default CPU for containers"
+        }
+
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "LimitRange"
+          container.type == "Container"
+
+          default_val := container["default"]
+          not default_val["memory"]
+          msg := "LimitRange must define default memory for containers"
+        }
+
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "LimitRange"
+          container.type == "Container"
+
+          default_req := container["defaultRequest"]
+          not default_req["cpu"]
+          msg := "LimitRange must define defaultRequest CPU for containers"
+        }
+
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "LimitRange"
+          container.type == "Container"
+
+          default_req := container["defaultRequest"]
+          not default_req["memory"]
+          msg := "LimitRange must define defaultRequest memory for containers"
+        }
+

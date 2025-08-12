@@ -1,0 +1,10 @@
+
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sNamespaceCompleteRequirements
+metadata:
+  name: enforce-namespace-policies
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Namespace", "ResourceQuota", "LimitRange"]

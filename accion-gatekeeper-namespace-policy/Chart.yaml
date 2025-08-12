@@ -1,0 +1,5 @@
+apiVersion: v2
+name: accion-gatekeeper-namespace-policy
+description: Enforces namespace naming and quota rules via Gatekeeper
+version: 0.1.0
+appVersion: "1.0"
